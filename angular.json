@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "projects": {
+    "counter": {
+      "projectType": "application",
+      "root": "",
+      "sourceRoot": "src",
+      "architect": {
+        "build": {
+          "builder": "@angular/build:application",
+          "options": {
+            "browser": "src/main.ts",
+            "tsConfig": "tsconfig.json",
+            "index": "src/index.html",
+            "optimization": {
+              "scripts": true,
+              "styles": {
+                "minify": true,
+                "inlineCritical": false
+              },
+              "fonts": false
+            },
+            "styles": [
+              "src/styles.css"
+            ],
+            "outputPath": "dist",
+            "baseHref": "./"
+          },
+          "configurations": {
+            "production": {
+              "optimization": true,
+              "outputHashing": "all"
+            }
+          }
+        },
+        "serve": {
+          "builder": "@angular/build:dev-server",
+          "options": {
+            "buildTarget": "counter:build"
+          }
+        }
+      }
+    }
+  },
+  "cli": {
+    "analytics": "ba4cd1b6-901a-4b20-95c6-a319b52cf7a8"
+  }
+}
