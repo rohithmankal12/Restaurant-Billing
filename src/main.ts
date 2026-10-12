@@ -22,9 +22,6 @@ class App {
  get activeItems(){return this.menu().filter(m=>m.active).length;}
  get recentInvoices(){return this.invoices().slice(0,5);}
  itemSales(invoices:any[]){const result=new Map<string,any>();for(const invoice of invoices)for(const line of invoice.lines||[]){const key=`${line.id}:${line.portion}`;const current=result.get(key)||{id:line.id,name:line.name,portion:line.portion,quantity:0,sales:0};current.quantity+=line.quantity;current.sales+=line.price*line.quantity;result.set(key,current);}return [...result.values()].sort((a,b)=>b.quantity-a.quantity||b.sales-a.sales||a.name.localeCompare(b.name));}
- get todayItemSales(){return this.itemSales(this.todayPaid);}
- get todayTopItems(){return this.todayItemSales.slice(0,5);}
- get todayPortions(){return this.todayItemSales.reduce((sum,item)=>sum+item.quantity,0);}
  get totalQuantity(){return this.lines().reduce((sum,l)=>sum+l.quantity,0);}
  get validLines(){return this.lines().every(l=>Number.isInteger(l.quantity)&&l.quantity>0&&l.quantity<=999);}
  suggestions(query:string){const q=query.trim().toLowerCase();if(!q)return [];return this.menu().filter(m=>m.active&&(m.name.toLowerCase().includes(q)||m.code.toLowerCase().startsWith(q))).sort((a,b)=>Number(b.code.toLowerCase()===q)-Number(a.code.toLowerCase()===q)||Number(b.name.toLowerCase().startsWith(q))-Number(a.name.toLowerCase().startsWith(q))||a.name.localeCompare(b.name)).slice(0,4);}

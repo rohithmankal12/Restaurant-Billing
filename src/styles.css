@@ -12,3 +12,4 @@ main{min-width:0;flex:1;padding:0 32px 42px}header{height:91px;display:flex;alig
 .stats{grid-template-columns:repeat(3,1fr)}
 .retention-setting{margin:18px 0;padding:15px;background:#fff7e8;border:1px solid #ead8b3;border-radius:10px}.retention-setting label{display:flex;align-items:center;gap:9px;margin:0;color:#48564f}.retention-setting input{width:90px;margin:0;text-align:center}.retention-setting span{font-weight:600}.retention-setting p{margin:9px 0 0;font-size:9px;color:#806f50}
 .restaurant-brand{align-items:flex-start;font-size:15px;line-height:1.25}.restaurant-brand .brand-icon{margin-top:1px}.restaurant-brand>div{padding-top:2px}.restaurant-brand small{margin-top:6px}
+.home-bottom{display:block}
