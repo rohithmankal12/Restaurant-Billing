@@ -16,10 +16,6 @@ class App {
  async logout(){await this.run(()=>this.api.logout());clearTimeout(this.draftTimer);this.authenticated=false;this.authPassword='';this.menu.set([]);this.invoices.set([]);this.lines.set([]);this.invoice=null;this.notice='';this.error='';this.cdr.detectChanges();}
  async changePassword(){if(this.newPassword!==this.confirmNewPassword){this.error='New passwords do not match.';return;}await this.run(async()=>{await this.api.changePassword(this.currentPassword,this.newPassword);this.currentPassword='';this.newPassword='';this.confirmNewPassword='';this.notice='Password updated.';});}
  async load(){await this.run(async()=>{const s=await this.api.snapshot();this.menu.set(s.menu);this.settings=s.settings;this.invoices.set(s.invoices);if(s.draft){this.lines.set(s.draft.lines||[]);this.discount=s.draft.discount||0;this.payment=s.draft.payment||'Cash';this.type=s.draft.type||'Dine-in';this.table=s.draft.table||'';this.customer=s.draft.customer||'';this.token=s.draft.token||crypto.randomUUID();}this.path=await this.api.dataPath();this.printers=await this.api.printers();if(!this.printers.length)this.settings.printer='__PDF__';});}
- get todayPaid(){return this.invoices().filter(i=>i.status==='Paid'&&this.dateKey(i.created)===today());}
- get todayRevenue(){return this.todayPaid.reduce((sum,i)=>sum+i.total,0);}
- get categoriesCount(){return new Set(this.menu().filter(m=>m.active).map(m=>m.category)).size;}
- get activeItems(){return this.menu().filter(m=>m.active).length;}
  get recentInvoices(){return this.invoices().slice(0,5);}
  itemSales(invoices:any[]){const result=new Map<string,any>();for(const invoice of invoices)for(const line of invoice.lines||[]){const key=`${line.id}:${line.portion}`;const current=result.get(key)||{id:line.id,name:line.name,portion:line.portion,quantity:0,sales:0};current.quantity+=line.quantity;current.sales+=line.price*line.quantity;result.set(key,current);}return [...result.values()].sort((a,b)=>b.quantity-a.quantity||b.sales-a.sales||a.name.localeCompare(b.name));}
  get totalQuantity(){return this.lines().reduce((sum,l)=>sum+l.quantity,0);}
