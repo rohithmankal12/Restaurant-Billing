@@ -66,18 +66,93 @@ The driver must support receipt media size; the app changes layout width but doe
 
 The renderer has no Node access; the preload exposes an allowlisted API and the main process validates price/portion/discount at checkout.
 
-## Build, tests and installers
+## Installer and client setup guide
+
+The installer must be built for the operating system on which it will be installed. Build the Windows `.exe` on Windows and the macOS `.dmg` on macOS. The generated installers are written to the `release` directory and can be copied to the client computer using a USB drive or another trusted transfer method.
+
+### Prepare the build computer
+
+1. Install [Node.js 24 LTS](https://nodejs.org/) and Git.
+2. Download or clone this repository.
+3. Open Terminal, PowerShell or Command Prompt inside the project directory.
+4. Install the exact dependencies and run the checks:
 
 ```sh
+npm ci
 npm test
 npm run build
-npm run package
+```
+
+An internet connection is required for `npm ci` and the first installer build. The installed billing application works locally without an internet connection.
+
+### Generate the Windows `.exe`
+
+Run these commands on a Windows computer:
+
+```powershell
+git clone https://github.com/rohithmankal12/Restaurant-Billing.git
+cd Restaurant-Billing
+npm ci
+npm test
 npm run dist
 ```
 
-`package` creates an unpacked desktop application; `dist` creates an installer for the current OS in `release`. Build Windows installers on Windows, macOS installers on macOS. Installers are unsigned unless you add your signing credentials. The source and local run workflow are the primary delivery.
+The NSIS setup file is generated in `release`, with a name similar to `Counter Billing Setup 1.0.0.exe`. Give this setup file to the client; do not copy the complete source project or `node_modules`.
 
-`npm run dev` offers UI preview only, not desktop database/printer functionality.
+On the client Windows computer:
+
+1. Install the official Epson TM-T82 Windows driver and connect the printer.
+2. Print a Windows test page and set the driver paper size to the installed roll width, normally 80 mm.
+3. Run `Counter Billing Setup 1.0.0.exe`. Because this installer is currently unsigned, Windows SmartScreen may show **Windows protected your PC**. Confirm that the file came from the trusted build computer, select **More info**, then **Run anyway**.
+4. Open **Counter Billing** from the Start menu or desktop shortcut.
+5. Create the owner login on first launch.
+6. Open **Settings**, enter the restaurant details, select the Epson TM-T82, select the matching paper width, save, and print a test receipt.
+7. Add or edit menu items before live billing. Create a sample invoice and confirm the item columns, total, paper alignment, cut and silent printing.
+
+Application data is stored in the signed-in Windows user's application-data directory, separate from the installation folder. Updating or reinstalling the application should retain it, but export a backup before replacing a live installation. Uninstalling the application does not serve as a backup procedure.
+
+### Generate the macOS `.dmg`
+
+Run these commands on a Mac:
+
+```sh
+git clone https://github.com/rohithmankal12/Restaurant-Billing.git
+cd Restaurant-Billing
+npm ci
+npm test
+npm run dist
+```
+
+The disk image is generated in `release`, with a name similar to `Counter Billing-1.0.0.dmg`. Build on the same CPU family as the client Mac unless universal/architecture-specific targets are added later.
+
+On the client Mac:
+
+1. Install a compatible Epson TM-T82 macOS driver, connect the printer, add it in **System Settings → Printers & Scanners**, and print a system test page.
+2. Open the `.dmg` and drag **Counter Billing** into **Applications**.
+3. The application is currently unsigned. On first launch, Control-click the application, choose **Open**, then confirm **Open**. If macOS blocks it, use **System Settings → Privacy & Security → Open Anyway** only after confirming the installer came from the trusted build computer.
+4. Create the owner login.
+5. Open **Settings**, enter the restaurant details, select the Epson printer and matching paper width, save, and print a test receipt.
+
+Application data is stored in the current macOS user's Application Support directory, separate from the application bundle. Export a backup before an update or migration.
+
+### Updating a client installation
+
+1. Export a database backup from the current application and copy it to a separate drive.
+2. Build a new installer from the updated `main` branch on the matching operating system.
+3. Close Counter Billing on the client computer.
+4. Run the new Windows installer, or replace the macOS application using the new `.dmg`.
+5. Open the application and confirm the menu, recent invoices, printer selection and one test receipt. Use **Restore backup** only if the existing data is missing or damaged.
+
+### Other build commands
+
+```sh
+npm run package
+npm run smoke
+```
+
+`npm run package` creates an unpacked application in `release`; it is useful for local testing but is not the client installer. `npm run smoke` checks that the Electron window can start after a successful web build. `npm run dev` provides a browser UI preview only and does not provide the desktop database or printer integration.
+
+The installers are unsigned until Windows code-signing and Apple Developer signing credentials are configured. Always verify a real receipt on the client printer before live billing.
 
 See PLAN.md for delivered scope and future extensions. This version is a single-counter application without staff login, inventory, kitchen tickets or multi-terminal synchronization. Receipt tax configuration is generic rather than a country-specific compliance engine.
 
